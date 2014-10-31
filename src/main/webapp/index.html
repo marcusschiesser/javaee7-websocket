@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>My-Aktion-Monitor - Java EE 7 websocket example</title>
+	<link rel="stylesheet" type="text/css" href="resources/css/screen.css">
+</head>
+<body>
+	<script>
+		function setCampaignId(id) {
+		if (id.match(/^\d+$/) !== null) {
+				clearText();
+				websocket.send(id);
+				console.log("send: " + id);
+			} else {
+				writeError("Not a valid campaign ID. Please try again!");
+			}
+		}
+		function clearText() {
+			var output = document.getElementById("output");
+			while (output.hasChildNodes()) {
+				output.removeChild(output.firstChild);
+			}
+		}
+		function writeText(message, pClass) {
+			var p = document.createElement("p");
+			p.setAttribute('class', pClass);
+			var text = document.createTextNode(message);
+			p.appendChild(text);
+			document.getElementById("output").appendChild(p);
+		}
+		function writeError(message) {
+			writeText(message, 'error');
+		}
+		var websocket = new WebSocket("ws://" + document.location.host 
+			+ document.location.pathname + "donation");
+		websocket.onopen = function (event) {
+			writeText("Connected! Please choose a campaign.");
+		};
+		websocket.onclose = function (event) {
+			writeText("The connection has been closed!");
+		};
+		websocket.onmessage = function (event) {
+			writeText(event.data);
+		};
+		websocket.onerror = function (event) {
+			writeError(event.data);
+		};
+	</script>
+	<div id="container">
+		<div id="header">
+		<p>Example application <b>My-Aktion-Monitor</b> – 
+				Java EE 7 websocket example</p>
+		</div>
+		<div id="content">
+			<form action="">
+				<label for="campaignId">Campaign-ID:</label>
+				<input id="campaignId" type="text">
+				<input onclick="setCampaignId(document.
+										getElementById('campaignId').value);"
+					value="Set" type="button">
+			</form>
+			<div id="output"></div>
+		</div>
+		<div id="footer">
+			<p>(C) 2014 Marcus Schiesser and Martin Schmollinger, MIT Lizenz</p>
+		</div>
+	</div>
+</body>
+</html>
